@@ -106,6 +106,28 @@ module PokitDok
       post('claims/status', params)
     end
 
+    def claims_convert(x12_claims_file)
+      claims_convert_url = URI.parse(@api_url + "/claims/convert")
+      File.open(x12_claims_file) do |f|
+        req = Net::HTTP::Post::Multipart.new claims_convert_url.path,
+          'file' => UploadIO.new(f, 'application/EDI-X12', x12_claims_file)
+        req['Authorization'] = "Bearer #{default_scope.token}"
+        req['User-Agent'] = user_agent
+
+        @response = Net::HTTP.start(claims_convert_url.host, claims_convert_url.port, :use_ssl => claims_convert_url.scheme == 'https') do |http|
+          http.request(req)
+        end
+      end
+      JSON.parse(@response.body)
+
+    end
+    # post(claims_convert_url, )
+
+    # return self.api_client.post(claims_convert_url,
+    #                             headers=self.base_headers,
+    #                             files={'file': (os.path.split(x12_claims_file)[-1], open(x12_claims_file, 'rb'),
+    #                                             'application/EDI-X12')}).json()
+
     # Invokes the eligibility endpoint.
     #
     # +params+ an optional hash of parameters that will be sent in the POST body
