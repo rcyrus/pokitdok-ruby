@@ -141,8 +141,7 @@ module PokitDok
         req['Authorization'] = "Bearer #{default_scope.token}"
         req['User-Agent'] = user_agent
 
-        req.use_ssl = true
-        @response = Net::HTTP.start(url.host, url.port) do |http|
+        @response = Net::HTTP.start(url.host, url.port, :use_ssl => url.scheme == 'https') do |http|
           http.request(req)
         end
       end
